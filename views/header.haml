@@ -1,0 +1,9 @@
+.container-fluid
+  .navbar.navbar-inverse
+    .navbar-inner
+      %a.brand(href="/")= t(:'header.heading')
+      %ul.nav
+        %li
+          %a{class: ( request.path_info =~ /\/vms/   ? 'active' : '' ), href: "/vms" }= t(:'header.nav.vms')
+        %li
+          %a{class: ( request.path_info =~ /\/isos/  ? 'active' : '' ), href: "/isos"}= t(:'header.nav.isos')

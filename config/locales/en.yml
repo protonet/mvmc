@@ -1,0 +1,28 @@
+en:
+
+  layout:
+    title: "Master VM Controller"
+
+  header:
+    heading: "Master VM Controller"
+    nav:
+      vms:  "Virtual Machines"
+      isos: "Bootable Disk Images"
+
+  dashboard:
+    heading: "Dashboard"
+    introduction: "Nothing Here"
+
+  isos:
+    index:
+      heading:
+      add_new:
+        file_upload: "Upload a new bootable ISO image"
+        from_url: "Where can we download this bootable ISO image"
+
+  vms:
+    index:
+      heading: "Your VMS"
+      introduction: "You have #{number_of_vms} runnnig."
+      destroy: "Destroy"
+      destroy-confirm: "Are you certain? This VM and all it's data will be instantly and ungracefully removed."
