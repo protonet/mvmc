@@ -2,7 +2,21 @@
 %head
   %title= t(:'layout.title')
   %link(rel="stylesheet" type="text/css" href="/css/bootstrap.min.css")
+  %script(type="text/javascript" src="/js/jquery-1.9.1.min.js")
+  %script(type="text/javascript" src="/js/bootstrap.min.js")
+  %script(type="text/javascript" src="/js/jquery.uploadifive.min.js")
 %body
   = haml :header
   = yield
-
+  :javascript
+    $(function() {
+      $('#file').uploadifive({
+        'uploadScript' : '/isos',
+        'buttonClass'  : 'btn',
+        'fileObjName'  : 'file',
+        'buttonText'   : '#{t(:'isos.form.select_files')}',
+        onQueueComplete: function() {
+          location.reload();
+        }
+      });
+    });

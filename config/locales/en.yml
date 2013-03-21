@@ -14,8 +14,18 @@ en:
     introduction: "Nothing Here"
 
   isos:
-    index:
+    new: "New"
+    table:
       heading:
+        basename: "Filename"
+        uploaded_at: "Uploaded At"
+        size: "Size"
+    form:
+      files: "Files"
+      select_files: "Select Files"
+    index:
+      heading: "Available Bootable Disk Images"
+      introduction:
       add_new:
         file_upload: "Upload a new bootable ISO image"
         from_url: "Where can we download this bootable ISO image"
