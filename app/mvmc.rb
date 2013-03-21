@@ -4,8 +4,8 @@ require 'sinatra/base'
 require 'sinatra/i18n'
 require 'sinatra/content_for'
 
-VMS_DIR  = File.expand_path(File.dirname(__FILE__), '../vms')
-ISOS_DIR = File.expand_path(File.dirname(__FILE__), '../isos')
+VMS_DIR  = File.expand_path(File.join(File.dirname(__FILE__), '../vms/'))
+ISOS_DIR = File.expand_path(File.join(File.dirname(__FILE__), '../isos/'))
 
 ISO = Struct.new(:basename, :mtime, :size)
 
@@ -36,6 +36,13 @@ class Runner
 
 end
 
+class VMHost
+  def self.private_ip
+    r = Runner.command "ifconfig eth0 | grep 'inet addr:' | cut -f2 -d: | awk '{ print $1 }'"
+    r.lines.join('').strip
+  end
+end
+
 class VM
 
   attr_reader :number, :name, :state
@@ -48,11 +55,15 @@ class VM
     5900 + number.to_i
   end
 
+  def running?
+    state =~ /running/
+  end
+
   def self.all
     if r = Runner.command('virsh list --inactive --all')
       if r.success?
         r.lines[2..-1].collect do |line|
-          res = line.split("\s").map(&:strip)
+          res = line.split("\s", 3).map(&:strip)
           new(*res)
         end
       end
@@ -61,14 +72,29 @@ class VM
     end
   end
 
-  def self.create(name, bootiso)
-    command(create_command(name, bootiso)).success?
+  def self.create(name, bootiso, cdiso)
+    hdd_r = create_hdd(name)
+    if hdd_r.success?
+      create(name, bootiso, cdiso)
+    else
+      raise hdd_r.output
+    end
   end
 
-  private
+  def self.create_hdd(name)
+    Runner.command(create_hdd_command(name))
+  end
 
-  def self.create_command(name, bootiso, cdiso)
-    cc = <<-EOCREATECOMMAND.unindent
+  def self.create_hdd_command(name)
+    "sudo qemu-img create \"#{name}\" \"#{opts.vm_hdd_image_size}\" \"#{opts.vm_hdd_image % name}\""
+  end
+
+  def self.create(name, bootiso, cdiso)
+    Runner.command(create_command(name, bootiso, cdiso))
+  end
+
+  def self.create_command(name, bootiso, cdiso = '')
+    cc = <<-EOCREATECOMMAND.unindent.gsub(/\s+/, ' ')
       sudo virt-install                                                   \
         --force                                                           \
         --graphics vnc,listen=0.0.0.0 --noautoconsole                     \
@@ -77,14 +103,13 @@ class VM
         --disk="#{opts.vm_hdd_image % name}",bus=virtio,cache=none        \
         --network bridge:virbr0,model=e1000                               \
         --vcpus="#{opts.vm_num_cpus}"                                     \
-        -c "#{File.join(VMS_DIR + bootiso)}"                              \
+        -c "#{File.join(VMS_DIR, bootiso)}"                              \
         -n "#{name}"                                                      \
         -r "#{opts.vm_ram}"
     EOCREATECOMMAND
     if cdiso
-      cc.lines.insert(6, "--disk path=\"#{File.join(VMS_DIR + cdiso)}\",device=cdrom,perms=ro \\")
+      cc.lines.insert(6, "--disk path=\"#{File.join(VMS_DIR, cdiso)}\",device=cdrom,perms=ro")
     end
-    cc
   end
 
   def self.opts
@@ -120,24 +145,30 @@ class Mvmc < Sinatra::Base
   end
 
   get '/vms' do
-    @vms = VM.all
+    @vms  = VM.all
+    @isos = isos
     haml :'vms/index'
   end
 
   get '/isos' do
-    @isos = Dir.glob(File.join(ISOS_DIR, '*.iso')).collect do |file|
-      ISO.new(
-        File.basename(file),
-        File.mtime(file),
-        File.size(file) / 1024 / 1024
-      )
-    end
+    @isos = isos
     haml :'isos/index'
   end
 
   post '/vms' do
-    params.inspect
-    VM.send(:create_command, params[:name], params["bootiso"])
+    @create_hdd_command = VM.create_hdd_command(params["name"])
+    @create_command      = VM.create_command(params["name"], params["bootiso"], params["cdiso"])
+    return [@create_hdd_command, @create_command].inspect
+  end
+
+  post '/vms/:name/start' do |name|
+    VM.new(nil, name, nil).start
+    status 204
+  end
+
+  post '/vms/:name/stop' do |name|
+    VM.new(nil, name, nil).stop
+    status 204
   end
 
   get '/isos/:basename' do |basename|
@@ -146,11 +177,23 @@ class Mvmc < Sinatra::Base
 
   post '/isos' do
     if params['file']
-      File.open(File.join(settings.isos_dir, params['file'][:filename]), 'wb') do |f|
+      File.open(File.join(ISOS_DIR, params['file'][:filename]), 'wb') do |f|
         f.write(params['file'][:tempfile].read)
       end
     end
     status 200
+  end
+
+  private
+
+  def isos
+    Dir.glob(File.join(ISOS_DIR, '*.iso')).collect do |file|
+      ISO.new(
+        File.basename(file),
+        File.mtime(file),
+        File.size(file) / 1024 / 1024
+      )
+    end
   end
 
 end

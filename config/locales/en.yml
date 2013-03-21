@@ -36,6 +36,9 @@ en:
         name: "Machine Name"
         vnc_port: "VNC Port"
         state: "State"
+      button:
+        start: "Start"
+        stop:  "Stop"
     form:
       heading: "Create New VM"
       name:    "Name"

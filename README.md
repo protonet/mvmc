@@ -28,16 +28,12 @@ In order to use the remote control you'll need to have the access to the cebit
 node without a password prompt (use ssh keys) and a user on the box that can
 use `sudo` to call `virt-install` and `virsh` without asking for a password.
 
-And second the `sudoers.d` entries for your user on the node:
+The `sudoers.d` entries for your user on the node:
 
-    echo "protonet ALL=NOPASSWD:/usr/bin//usr/bin/virsh" >
-    /etc/profile.d/protonet_passwordless_virsh
-
-    echo "protonet ALL=NOPASSWD:/usr/bin//usr/bin/virt-install" >
-    /etc/profile.d/protonet_passwordless_virt-install
-
-    echo "protonet ALL=NOPASSWD:/usr/bin//usr/bin/qemu-img" >
-    /etc/profile.d/protonet_passwordless_qemu-img
+    sudo echo "protonet ALL=NOPASSWD:/usr/bin/virsh"        > /etc/sudoers.d/protonet_passwordless_virsh
+    sudo echo "protonet ALL=NOPASSWD:/usr/bin/virt-install" > /etc/sudoers.d/protonet_passwordless_virt-install
+    sudo echo "protonet ALL=NOPASSWD:/bin/qemu-img"         > /etc/sudoers.d/protonet_passwordless_qemu-img
+    sudo chmod 0400 /etc/sudoers.d/*
 
 ## Usage
 
