@@ -24,13 +24,9 @@ It'll be started on port `:9292`.
 
 ## Setting Up
 
-In order to use the remote control you'll need to have the `nodessh` wrapper,
-and a user on the box that can use `sudo` to call `virt-install` and `virsh`
-without asking for a password.
-
-These commands might help, first the `nodessh` alias for your dotfiles:
-
-    alias nodessh='ssh -o "ProxyCommand nc -X connect -x ssh.protonet.info:8022 %h %p" -o "User protonet"'
+In order to use the remote control you'll need to have the access to the cebit
+node without a password prompt (use ssh keys) and a user on the box that can
+use `sudo` to call `virt-install` and `virsh` without asking for a password.
 
 And second the `sudoers.d` entries for your user on the node:
 
@@ -39,6 +35,21 @@ And second the `sudoers.d` entries for your user on the node:
 
     echo "protonet ALL=NOPASSWD:/usr/bin//usr/bin/virt-install" >
     /etc/profile.d/protonet_passwordless_virt-install
+
+    echo "protonet ALL=NOPASSWD:/usr/bin//usr/bin/qemu-img" >
+    /etc/profile.d/protonet_passwordless_qemu-img
+
+## Usage
+
+You will almost certainly want to download the *libvirt* Windows drivers, the
+ISO can be downloaded from:
+
+ * http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-52.iso
+
+It must simply be uploaded along with all the other ISOs, where it should be
+chosen as the "CD ISO" image in order that the Windows host can have access to
+some driver image in order that the Windows host can have access to some
+drivers.
 
 ## Test
 
