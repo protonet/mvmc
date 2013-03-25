@@ -1,2 +1,2 @@
-vms/
-isos/
+/vms/*
+/isos/*

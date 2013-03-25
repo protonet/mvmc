@@ -1,0 +1,32 @@
+.container-fluid
+  .row-fluid
+    .span6
+      %h1= t(:'isos.index.heading')
+      :markdown
+        #{t(:'isos.index.introduction')}
+      %table.table.table-striped
+        %thead
+          %tr
+            %th= t(:'isos.table.heading.basename')
+            %th= t(:'isos.table.heading.uploaded_at')
+            %th= t(:'isos.table.heading.size')
+        %tbody
+          - @isos.each do |file|
+            %tr
+              %td
+                %i.icon-download-alt
+                %a{href: "isos/#{file.basename}"}= file.basename
+              %td= file.mtime
+              %td
+                = file.size
+                MB
+              %td
+                %form(action="/vms" method="get")
+                  %input{type: "hidden", name: "bootiso", id: "bootiso", value: file.basename }
+                  %button(type="submit" class="btn btn-primary btn-mini")
+                    %i.icon-plus.icon-white
+                    = t(:'isos.new')
+
+    .span6
+      %h1 Jumping The Shark
+      .well= haml :'isos/form'

@@ -1,0 +1,21 @@
+%h2
+  = t(:'vms.form.heading')
+%form.form-horizontal(action="/vms" method="post")
+  .control-group
+    %label.control-label(for="name")= t(:'vms.form.name')
+    .controls
+      %input(type="text" id="name" name="name")
+  .control-group
+    %label.control-label(for="cdiso")= t(:'vms.form.cdiso')
+    .controls
+      %select{id: "cdiso", name: "cdiso"}
+        - @isos.each do |file|
+          %option{value: file.basename}= file.basename
+  .control-group
+    %label.control-label(for="bootiso")= t(:'vms.form.bootiso')
+    .controls
+      %select{id: "bootiso", name: "bootiso"}
+        - @isos.each do |file|
+          %option{value: file.basename, selected: (file.basename == params[:bootiso] ? 'selected' : '')}= file.basename
+  .form-actions
+    %input.btn.btn-primary{type: "submit", value: t(:'vms.form.submit')}

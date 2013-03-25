@@ -1,0 +1,35 @@
+- vm_host_ip = VMHost.private_ip
+.container-fluid
+  .row-fluid
+    .span6
+      %table.table.table-striped
+        %thead
+          %tr
+            %th= t(:'vms.table.heading.name')
+            %th= t(:'vms.table.heading.vnc_port')
+            %th= t(:'vms.table.heading.state')
+
+        - @vms.each do |vm|
+          %tr
+            %td= vm.name
+            %td
+              - vnc_ip_and_port = sprintf("%s:%s", vm_host_ip, vm.vnc_port)
+              %a{ href: "vnc://#{vnc_ip_and_port}" }= vnc_ip_and_port
+            %td= vm.state
+            %td
+              - if vm.running?
+                %a.btn.btn-mini
+                  %i.icon-stop
+                  = t(:'vms.table.button.stop')
+              - else
+                %a.btn.btn-mini
+                  %i.icon-play
+                  = t(:'vms.table.button.start')
+
+    .span6
+      = haml :'vms/form'
+
+      - if @vm
+        = haml :'vms/show', vm: vm
+      - else
+        = haml :'vms/select_one'
