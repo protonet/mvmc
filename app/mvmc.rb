@@ -4,13 +4,16 @@ require 'sinatra/base'
 require 'sinatra/content_for'
 require 'sinatra/i18n'
 
-VIRSH_HOST = "protonet@cebit.local"
-VIRSH_URI  = "qemu+ssh://#{VIRSH_HOST}/system?socket=/var/run/libvirt/libvirt-sock"
+VIRSH_HOST     = ""
+VIRSH_URI      = "qemu://#{VIRSH_HOST}/system?socket=/var/run/libvirt/libvirt-sock"
+VIRSH_POOL_DIR = "/var/lib/libvirt/images"
 
-VMS_DIR    = File.expand_path(File.join(File.dirname(__FILE__), '../vms/'))
-ISOS_DIR   = File.expand_path(File.join(File.dirname(__FILE__), '../isos/'))
+VMS_DIR        = File.expand_path(File.join(File.dirname(__FILE__), '../vms/'))
+ISOS_DIR       = File.expand_path(File.join(File.dirname(__FILE__), '../isos/'))
 
 ISO = Struct.new(:basename, :mtime, :size)
+
+$libvirt = Libvirt::open(VIRSH_URI)
 
 module Virsh
 
@@ -68,7 +71,7 @@ module Virsh
         xml.pool type: :dir do |pool|
           pool.name "virsh-images"
           pool.target do |target|
-            target.path "/root/virsh-images"
+            target.path VIRSH_POOL_DIR
           end
         end
         warn xml.target!
@@ -126,7 +129,7 @@ class VM
     elements = doc.elements.to_a('/domain/devices/graphics')
     ports    = elements.collect { |e| e.attribute(:port).value }
     port     = ports.first
-    "vnc://#{VIRSH_HOST}:#{port}"
+    "vnc://#{$libvirt.hostname}:#{port}"
   end
 
   class << self
@@ -239,7 +242,9 @@ class VM
             video.address type: :pci, domain: '0x0000', bus: '0x00', slot: '0x02', function: '0x0'
           end
 
-          devices.graphics type: :vnc, port: -1
+          devices.graphics type: :vnc, autostart: :no, listen: '0.0.0.0' do |graphics|
+            graphics.listen type: :address, address: '0.0.0.0'
+          end
 
         end
 

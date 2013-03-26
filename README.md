@@ -8,11 +8,18 @@ That is both good and bad, but we have our reasons!
 
 ## Installation
 
-You'll need Ruby `1.9.3-p194` or greater, it was built against Ruby `2.0.0-p0.
+You'll need the `libvirt-dev` package for your platform, as well as `libvirt``
+and `virsh`:
+
+    # apt-get install -y libvirt-dev libvirt virsh
+    # apt-get install -y
+
+You'll also need Ruby `1.9.3-p194` or greater, it was built against Ruby
+`2.0.0-p0.
 
     $ git clone https://github.com/protonet/mvmc protonet-mvmc
     $ cd protonet-mvmc
-    $ bundle
+    $ protonet_bundle
 
 ## Starting
 
