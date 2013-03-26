@@ -4,7 +4,7 @@ require 'sinatra/base'
 require 'sinatra/content_for'
 require 'sinatra/i18n'
 
-VIRSH_URI = "qemu:///system?socket=/var/run/libvirt/libvirt-sock"
+VIRSH_URI = "qemu:///system"
 VIRSH_POOL_DIR = "/var/lib/libvirt/images"
 
 VMS_DIR        = File.expand_path(File.join(File.dirname(__FILE__), '../vms/'))
