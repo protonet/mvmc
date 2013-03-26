@@ -1,4 +1,3 @@
-- vm_host_ip = VMHost.private_ip
 .container-fluid
   .row-fluid
     .span6
@@ -6,23 +5,28 @@
         %thead
           %tr
             %th= t(:'vms.table.heading.name')
-            %th= t(:'vms.table.heading.vnc_port')
             %th= t(:'vms.table.heading.state')
+            %th= t(:'vms.table.heading.vnc')
 
         - @vms.each do |vm|
           %tr
-            %td= vm.name
             %td
-              - vnc_ip_and_port = sprintf("%s:%s", vm_host_ip, vm.vnc_port)
-              %a{ href: "vnc://#{vnc_ip_and_port}" }= vnc_ip_and_port
-            %td= vm.state
+              = vm.name
+            %td
+              = vm.state
             %td
               - if vm.running?
-                %a.btn.btn-mini
+                %a{href: vm.vnc_address_with_port}= vm.vnc_address_with_port
+            %td
+              - if vm.running?
+                %a.btn.btn-mini{href: "/vms/#{vm.uuid}/shutdown"}
+                  %i.icon-stop
+                  = t(:'vms.table.button.shutdown')
+                %a.btn.btn-mini{href: "/vms/#{vm.uuid}/stop"}
                   %i.icon-stop
                   = t(:'vms.table.button.stop')
               - else
-                %a.btn.btn-mini
+                %a.btn.btn-mini{href: "/vms/#{vm.uuid}/start"}
                   %i.icon-play
                   = t(:'vms.table.button.start')
 

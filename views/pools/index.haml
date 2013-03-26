@@ -1,0 +1,29 @@
+.container-fluid
+  .row-fluid
+    %table.table.table-striped
+      %thead
+        %tr
+          %th= t(:'storage.pools.index.table.heading')
+      %tbody
+        - @pools.each do |pool|
+          %tr
+            %th(colspan="3")
+              %code= pool.uuid
+          - if pool.volumes.any?
+            %tr
+              %td= t(:'storage.pools.index.table.volumes.heading.path')
+              %td= t(:'storage.pools.index.table.volumes.heading.allocated_available')
+            - pool.volumes.each do |volume|
+              %tr
+                %td
+                  %code= volume.path
+                %td
+                  %code
+                    = volume.info.allocation / 1024 / 1024 / 1024
+                    GB
+                    /
+                    = volume.info.capacity / 1024 / 1024 / 1024
+                    GB
+          - else
+            %tr
+              %td(colspan="2")= t(:'storage.pools.index.table.volumes.no_volumes')

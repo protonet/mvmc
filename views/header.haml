@@ -7,3 +7,5 @@
           %a{class: ( request.path_info =~ /\/vms/   ? 'active' : '' ), href: "/vms" }= t(:'header.nav.vms')
         %li
           %a{class: ( request.path_info =~ /\/isos/  ? 'active' : '' ), href: "/isos"}= t(:'header.nav.isos')
+        %li
+          %a{class: ( request.path_info =~ /\/pools/  ? 'active' : '' ), href: "/pools"}= t(:'header.nav.pools')

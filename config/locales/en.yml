@@ -8,6 +8,7 @@ en:
     nav:
       vms:  "Virtual Machines"
       isos: "Bootable Disk Images"
+      pools: "Storage Pools"
 
   dashboard:
     heading: "Dashboard"
@@ -30,20 +31,35 @@ en:
         file_upload: "Upload a new bootable ISO image"
         from_url: "Where can we download this bootable ISO image"
 
+  storage:
+    pools:
+      index:
+        table:
+          heading: "Storage Pool UUID"
+          volumes:
+            heading:
+              path: "Path"
+              allocated_available : "Allocated / Available"
   vms:
     table:
       heading:
         name: "Machine Name"
-        vnc_port: "VNC Port"
+        vnc: "VNC"
         state: "State"
       button:
         start: "Start"
         stop:  "Stop"
+        shutdown:  "Shutdown"
     form:
       heading: "Create New VM"
       name:    "Name"
       bootiso: "Boot ISO"
-      cdiso:   "CD ISO"
+      volumes:
+        name: "Volume Name"
+        capacity: "Capacity (G)"
+      cdisos:
+        "0": "Boot ISO"
+        "1": "CDROM ISO"
       submit:  "Create VM"
     index:
       heading: "Your VMS"

@@ -1,21 +1,30 @@
 %h2
   = t(:'vms.form.heading')
 %form.form-horizontal(action="/vms" method="post")
-  .control-group
-    %label.control-label(for="name")= t(:'vms.form.name')
-    .controls
-      %input(type="text" id="name" name="name")
-  .control-group
-    %label.control-label(for="cdiso")= t(:'vms.form.cdiso')
-    .controls
-      %select{id: "cdiso", name: "cdiso"}
-        - @isos.each do |file|
-          %option{value: file.basename}= file.basename
-  .control-group
-    %label.control-label(for="bootiso")= t(:'vms.form.bootiso')
-    .controls
-      %select{id: "bootiso", name: "bootiso"}
-        - @isos.each do |file|
-          %option{value: file.basename, selected: (file.basename == params[:bootiso] ? 'selected' : '')}= file.basename
+  %fieldset
+    %legend Virtual Machine
+    .control-group
+      %label.control-label(for="vm_name")= t(:'vms.form.name')
+      .controls
+        %input(type="text" id="vm_name" name="vm[name]" data-entity-name=true)
+    - (0..1).each do |num|
+      .control-group
+        %label.control-label{ for: "vm_name[cdisos][#{num}]" }= t(:"vms.form.cdisos.#{num}")
+        .controls
+          %select{ id: "vm_cdisos_#{num}", name: "vm[cdisos][#{num}]" }
+            - @isos.each do |file|
+              %option{value: File.join(ISOS_DIR, file.basename)}= file.basename
+  %fieldset
+    %legend Storage
+    - num = 0
+    .control-group
+      %label.control-label{for: "vm_volumes_#{num}_name"}= t(:'vms.form.volumes.name')
+      .controls
+        %input.input-medium{type: 'text', id: "vm_volumes_#{num}_name", name: "vm[volumes][#{num}][name]", 'data-entity-name' => 'true'}
+    .control-group
+      %label.control-label{for: "vm_volumes_#{num}_capacity"}= t(:'vms.form.volumes.capacity')
+      .controls
+        %input.input-mini{type: 'text', id: "vm_volumes_#{num}_capacity", name: "vm[volumes][#{num}][capacity]", value: "25"}
+
   .form-actions
     %input.btn.btn-primary{type: "submit", value: t(:'vms.form.submit')}

@@ -3,6 +3,7 @@
   %title= t(:'layout.title')
   %link(rel="stylesheet" type="text/css" href="/css/bootstrap.min.css")
   %script(type="text/javascript" src="/js/jquery-1.9.1.min.js")
+  %script(type="text/javascript" src="/js/string.min.js")
   %script(type="text/javascript" src="/js/bootstrap.min.js")
   %script(type="text/javascript" src="/js/jquery.uploadifive.min.js")
 %body
@@ -18,5 +19,9 @@
         onQueueComplete: function() {
           location.reload();
         }
+      });
+      $('[data-entity-name]').on('keypress', function(e) {
+        var $this = $(this);
+        $this.val(S($this.val()).toLowerCase().dasherize().s);
       });
     });
