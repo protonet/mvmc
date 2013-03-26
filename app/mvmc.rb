@@ -4,8 +4,7 @@ require 'sinatra/base'
 require 'sinatra/content_for'
 require 'sinatra/i18n'
 
-VIRSH_HOST     = ""
-VIRSH_URI      = "qemu://#{VIRSH_HOST}/system?socket=/var/run/libvirt/libvirt-sock"
+VIRSH_URI = "qemu:///system?socket=/var/run/libvirt/libvirt-sock"
 VIRSH_POOL_DIR = "/var/lib/libvirt/images"
 
 VMS_DIR        = File.expand_path(File.join(File.dirname(__FILE__), '../vms/'))
@@ -37,30 +36,26 @@ module Virsh
 
     class << self
       def find(uuid)
-        pool = libvirt.lookup_storage_pool_by_uuid(uuid)
+        pool = $libvirt.lookup_storage_pool_by_uuid(uuid)
         StoragePool.new.tap do |sp|
           sp.uuid = uuid
         end
       end
       def create_default
-        libvirt.define_storage_pool_xml(create_pool_xml).tap do |pool|
+        $libvirt.define_storage_pool_xml(create_pool_xml).tap do |pool|
           pool.build
           pool.create
           pool.autostart = true
         end
       end
       def all
-        libvirt.list_storage_pools.collect do |pool_name|
-          pool = libvirt.lookup_storage_pool_by_name(pool_name)
+        $libvirt.list_storage_pools.collect do |pool_name|
+          pool = $libvirt.lookup_storage_pool_by_name(pool_name)
           StoragePool.new.tap do |sp|
             sp.name = pool.name
             sp.uuid = pool.uuid
           end
         end
-      end
-
-      def libvirt
-        @_libvirt ||= Libvirt::open(VIRSH_URI)
       end
 
       private
@@ -89,11 +84,7 @@ module Virsh
     end
 
     def pool
-      libvirt.lookup_storage_pool_by_uuid(uuid)
-    end
-
-    def libvirt
-      self.class.libvirt
+      $libvirt.lookup_storage_pool_by_uuid(uuid)
     end
 
   end
@@ -112,8 +103,12 @@ class VM
     domain.create
   end
 
-  def stop
-    domain.stop
+  def destroy
+    domain.destroy
+  end
+
+  def undefine
+    domain.undefine
   end
 
   def shutdown
@@ -124,12 +119,11 @@ class VM
     domain.state
   end
 
-  def vnc_address_with_port
+  def vnc_port
     doc      = REXML::Document.new(domain.xml_desc)
     elements = doc.elements.to_a('/domain/devices/graphics')
     ports    = elements.collect { |e| e.attribute(:port).value }
-    port     = ports.first
-    "vnc://#{$libvirt.hostname}:#{port}"
+    ports.first
   end
 
   class << self
@@ -139,8 +133,8 @@ class VM
     end
 
     def defined
-     libvirt.list_defined_domains.collect do |domain_name|
-        domain = libvirt.lookup_domain_by_name(domain_name)
+     $libvirt.list_defined_domains.collect do |domain_name|
+        domain = $libvirt.lookup_domain_by_name(domain_name)
         VM.new.tap do |vm|
           vm.id   = domain.id rescue nil
           vm.uuid = domain.uuid
@@ -150,8 +144,8 @@ class VM
     end
 
     def running
-      libvirt.list_domains.collect do |domain_id|
-        domain = libvirt.lookup_domain_by_id(domain_id)
+      $libvirt.list_domains.collect do |domain_id|
+        domain = $libvirt.lookup_domain_by_id(domain_id)
         VM.new.tap do |vm|
           vm.id   = domain_id
           vm.uuid = domain.uuid
@@ -160,12 +154,8 @@ class VM
       end
     end
 
-    def libvirt
-      @_libvirt ||= Libvirt::open(VIRSH_URI)
-    end
-
     def create(name, cdiso_paths, volume_paths)
-      domain = libvirt.define_domain_xml(create_xml(name, cdiso_paths, volume_paths))
+      domain = $libvirt.define_domain_xml(create_xml(name, cdiso_paths, volume_paths))
       domain.tap do |d|
         domain.autostart = true
         domain.create
@@ -256,12 +246,8 @@ class VM
 
   private
 
-  def libvirt
-    self.class.libvirt
-  end
-
   def domain
-    libvirt.lookup_domain_by_uuid(uuid)
+    $libvirt.lookup_domain_by_uuid(uuid)
   end
 
 end
@@ -283,7 +269,7 @@ class Mvmc < Sinatra::Base
   end
 
   get '/dashboard' do
-    haml :'dashboard/index'
+    redirect to('/vms'), 303
   end
 
   get '/vms' do
@@ -324,10 +310,17 @@ class Mvmc < Sinatra::Base
     redirect '/vms'
   end
 
+  get '/vms/:uuid/undefine' do |uuid|
+    VM.new.tap do |vm|
+      vm.uuid = uuid
+    end.undefine
+    redirect '/vms'
+  end
+
   get '/vms/:uuid/stop' do |uuid|
     VM.new.tap do |vm|
       vm.uuid = uuid
-    end.stop
+    end.destroy
     redirect '/vms'
   end
 

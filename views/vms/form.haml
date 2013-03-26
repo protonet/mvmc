@@ -12,6 +12,7 @@
         %label.control-label{ for: "vm_name[cdisos][#{num}]" }= t(:"vms.form.cdisos.#{num}")
         .controls
           %select{ id: "vm_cdisos_#{num}", name: "vm[cdisos][#{num}]" }
+            %option
             - @isos.each do |file|
               %option{value: File.join(ISOS_DIR, file.basename)}= file.basename
   %fieldset

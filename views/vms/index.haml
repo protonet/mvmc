@@ -16,7 +16,8 @@
               = vm.state
             %td
               - if vm.running?
-                %a{href: vm.vnc_address_with_port}= vm.vnc_address_with_port
+                - vnc_address_with_port = sprintf("vnc://%s:%d", request.host, vm.vnc_port)
+                %a{href: vnc_address_with_port}= vnc_address_with_port
             %td
               - if vm.running?
                 %a.btn.btn-mini{href: "/vms/#{vm.uuid}/shutdown"}
@@ -29,6 +30,9 @@
                 %a.btn.btn-mini{href: "/vms/#{vm.uuid}/start"}
                   %i.icon-play
                   = t(:'vms.table.button.start')
+                %a.btn.btn-mini.btn-danger{href: "/vms/#{vm.uuid}/undefine"}
+                  %i.icon-trash.icon-white
+                  = t(:'vms.table.button.undefine')
 
     .span6
       = haml :'vms/form'
