@@ -22,6 +22,7 @@ class Mvmc < Sinatra::Base
 
   set :root,     File.join(File.dirname(__FILE__), '../')
   set :locales,  File.join(File.dirname(__FILE__), '../', 'config/locales/en.yml')
+  set :method_override, true
 
   helpers Sinatra::Cookies
   helpers Sinatra::ContentFor
@@ -79,6 +80,12 @@ class Mvmc < Sinatra::Base
 
   get '/dashboard' do
     redirect to('/vms'), 303
+  end
+
+  delete '/pools/:uuid/volumes/:path' do |pool_uuid, escaped_path|
+    pool = $libvirt.lookup_storage_pool_by_uuid(pool_uuid)
+    pool.lookup_volume_by_path(CGI.unescape(escaped_path)).delete
+    redirect back
   end
 
   get '/vms' do

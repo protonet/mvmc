@@ -95,6 +95,10 @@ class VM
           os.boot dev: :cdrom
         end
 
+        domain.features do |features|
+          features.acpi
+        end
+
         domain.devices do |devices|
 
           devices.emulator "/usr/bin/kvm"

@@ -4,7 +4,7 @@
       %tbody
         - @pools.each do |pool|
           %tr
-            %th(colspan="3")
+            %th(colspan="4")
               %h3= pool.name
           - if pool.volumes.any?
             %tr
@@ -21,6 +21,12 @@
                 %td
                   = volume.info.capacity / 1024 / 1024
                   MB
+                %td
+                  %form{action:"/pools/#{pool.uuid}/volumes/#{CGI.escape(volume.path)}", method: "post"}
+                    %input(type="hidden" name="_method" value="delete")
+                    %button.btn.btn-danger(type="submit")
+                      %i.icon-trash.icon-white
+                      = t(:'storage.pools.index.table.volumes.delete')
           - else
             %tr
-              %td(colspan="2")= t(:'storage.pools.index.table.volumes.no_volumes')
+              %td(colspan="4")= t(:'storage.pools.index.table.volumes.no_volumes')

@@ -41,6 +41,7 @@ en:
               path: "Path"
               allocation : "Allocation"
               capacity: "Capacity"
+            delete: "Delete"
   vms:
     table:
       heading:
