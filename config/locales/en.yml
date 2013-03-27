@@ -18,10 +18,10 @@ en:
     new: "New"
     table:
       heading:
-        basename: "Filename"
-        uploaded_at: "Uploaded At"
-        size: "Size"
+        path: "Path"
+        allocation: "Allocation"
     form:
+      heading: "Upload New ISOs"
       files: "Files"
       select_files: "Select Files"
     index:
@@ -39,7 +39,8 @@ en:
           volumes:
             heading:
               path: "Path"
-              allocated_available : "Allocated / Available"
+              allocation : "Allocation"
+              capacity: "Capacity"
   vms:
     table:
       heading:
@@ -57,7 +58,7 @@ en:
       bootiso: "Boot ISO"
       volumes:
         name: "Volume Name"
-        capacity: "Capacity (G)"
+        capacity: "Capacity (Bytes)"
       cdisos:
         "0": "Boot ISO"
         "1": "CDROM ISO"

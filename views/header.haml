@@ -9,3 +9,6 @@
           %a{class: ( request.path_info =~ /\/isos/  ? 'active' : '' ), href: "/isos"}= t(:'header.nav.isos')
         %li
           %a{class: ( request.path_info =~ /\/pools/  ? 'active' : '' ), href: "/pools"}= t(:'header.nav.pools')
+      %form(class="navbar-form pull-right form-inline" action="/hypervisor" method="post")
+        %input{ type: "text", class: "span6", id: 'hypervisor_url', name: "hypervisor_url", value: hypervisor_url }
+        %button.btn(type="submit") Change

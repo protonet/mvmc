@@ -14,7 +14,7 @@
           %select{ id: "vm_cdisos_#{num}", name: "vm[cdisos][#{num}]" }
             %option
             - @isos.each do |file|
-              %option{value: File.join(ISOS_DIR, file.basename)}= file.basename
+              %option{value: file.path}= File.basename(file.path)
   %fieldset
     %legend Storage
     - num = 0
@@ -25,7 +25,7 @@
     .control-group
       %label.control-label{for: "vm_volumes_#{num}_capacity"}= t(:'vms.form.volumes.capacity')
       .controls
-        %input.input-mini{type: 'text', id: "vm_volumes_#{num}_capacity", name: "vm[volumes][#{num}][capacity]", value: "25"}
+        %input.input-mini{type: 'text', id: "vm_volumes_#{num}_capacity", name: "vm[volumes][#{num}][capacity]", value: "26214400"}
 
   .form-actions
     %input.btn.btn-primary{type: "submit", value: t(:'vms.form.submit')}

@@ -1,0 +1,6 @@
+.container-fluid
+  .row-fluid
+    - if $libvirt
+      = haml :'hypervisor/capabilities'
+    - else
+      = haml :'hypervisor/not_connected'
