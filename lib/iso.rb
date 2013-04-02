@@ -1,1 +1,1 @@
-ISO = Struct.new(:basename, :mtime, :size)
+ISO = Struct.new(:path, :info)
