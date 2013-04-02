@@ -30,24 +30,15 @@ module Virsh
         find($libvirt.lookup_storage_pool_by_name(name).uuid)
       end
       def create_defaults
-        begin
-          $libvirt.lookup_storage_pool_by_name('virsh-images')
-        rescue
-          warn "Couldn't find pool virsh-images, will create"
-          $libvirt.define_storage_pool_xml(create_pool_xml('virsh-images')).tap do |pool|
-            pool.build
-            pool.create
-            pool.autostart = true
-          end
-        end
-        begin
-          $libvirt.lookup_storage_pool_by_name('virsh-isos')
-        rescue
-          warn "Couldn't find pool virsh-isos, will create"
-          $libvirt.define_storage_pool_xml(create_pool_xml('virsh-isos')).tap do |pool|
-            pool.build
-            pool.create
-            pool.autostart = true
+        %w{virsh-images virsh-isos}.each do |name|
+          begin
+            $libvirt.define_storage_pool_xml(create_pool_xml(name)).tap do |pool|
+              pool.build
+              pool.create
+              pool.autostart = true
+            end
+          rescue Libvirt::DefinitionError
+            # Nothing to do :-)
           end
         end
       end
@@ -72,7 +63,6 @@ module Virsh
             target.path File.join(VIRSH_POOL_DIR, name)
           end
         end
-        warn xml.target!
         xml.target!
       end
     end

@@ -46,18 +46,14 @@ class Mvmc < Sinatra::Base
       hvuri = params[:hypervisor_url] || cookies[:hypervisor_url] || DEFAULT_HYPERVISOR_URL
       $libvirt.close if $livbirt
       $libvirt = Libvirt::open(hvuri)
+      Virsh::StoragePool.create_defaults
     rescue Libvirt::ConnectionError
-      warn "Couldn't access hypervisor at #{hvuri}"
+      warn "Couldn't access hypervisor at #{hvuri} #{$@}"
     ensure
       if !$libvirt or $libvirt.closed?
         redirect to('/hypervisor') unless request.path_info == '/hypervisor'
         return
       end
-    end
-    begin
-      Virsh::StoragePool.create_defaults
-    rescue
-      warn "Couldn't create default storage volumes #{$!}"
     end
   end
 
